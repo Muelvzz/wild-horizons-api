@@ -6,12 +6,18 @@ const PORT = 8000
 const server = http.createServer(async (request, response) => {
   const urlProperty = request.url
   const requestMethod = request.method
+  const responseHeader = {'Content-Type': 'application/json'}
+
   const destination = await getDataFromDb()
+  const errorMessage = {
+    error: "not found", 
+    message: "The requested route does not exist"
+  }
 
   if (urlProperty === "/api" && requestMethod === "GET") {
     const stringifiedDestination = JSON.stringify(destination)
 
-    response.writeHead(200, { 'Content-Type': 'application/json' });
+    response.writeHead(200, responseHeader);
 
     response.write(stringifiedDestination)
     response.write("\n")
@@ -21,6 +27,9 @@ const server = http.createServer(async (request, response) => {
       "utf8", 
       () => console.log("response end")
     )
+  } else {
+    response.writeHead(404, responseHeader)
+    response.end(JSON.stringify(errorMessage))
   }
 })
 
