@@ -11,8 +11,11 @@ const server = http.createServer(async (request, response) => {
   if (urlProperty === "/api" && requestMethod === "GET") {
     const stringifiedDestination = JSON.stringify(destination)
 
+    response.writeHead(200, { 'Content-Type': 'application/json' });
+
     response.write(stringifiedDestination)
     response.write("\n")
+
     response.end(
       "Hello from the server!", 
       "utf8", 
