@@ -1,5 +1,7 @@
 import http from "node:http"
 import { getDataFromDb } from "./database/db.js"
+import { sendJsonResponse } from "./utils/sendJsonResponse.js"
+import { getFilteredResponse } from "./utils/getFilteredResponse.js"
 
 const PORT = 8000
 
@@ -17,29 +19,42 @@ const server = http.createServer(async (request, response) => {
   if (urlProperty === "/api" && requestMethod === "GET") {
     const stringifiedDestination = JSON.stringify(destination)
 
-    response.writeHead(200, responseHeader);
-
-    response.write(stringifiedDestination)
-    response.write("\n")
-
-    response.end(
-      "Hello from the server!", 
-      "utf8", 
-      () => console.log("response end")
+    sendJsonResponse(
+      response,
+      200,
+      responseHeader,
+      "Hello from the Node Server"
     )
+
   } else if(urlProperty.startsWith("/api/continent") && requestMethod === "GET") {
     const selectedContinent = urlProperty.split("/").pop()
-    const filteredContienent = destination.filter(
-      data => data.continent.toLowerCase() === selectedContinent.toLowerCase()
+    const filteredContinent = getFilteredResponse(destination, "continent", selectedContinent)
+
+    sendJsonResponse(
+      response,
+      200,
+      responseHeader,
+      filteredContinent
     )
 
-    response.writeHead(200, responseHeader)
+  } else if(urlProperty.startsWith("/api/country") && requestMethod === "GET" ) {
+    const selectedCountry = urlProperty.split("/").pop()
+    const filteredCountry = getFilteredResponse(destination, "country", selectedCountry)
 
-    response.end(JSON.stringify(filteredContienent))
+    sendJsonResponse(
+      response,
+      200,
+      responseHeader,
+      filteredCountry
+    )
 
   } else {
-    response.writeHead(404, responseHeader)
-    response.end(JSON.stringify(errorMessage))
+    sendJsonResponse(
+      response,
+      404,
+      responseHeader,
+      JSON.stringify(errorMessage)
+    )
   }
 })
 
