@@ -27,6 +27,16 @@ const server = http.createServer(async (request, response) => {
       "utf8", 
       () => console.log("response end")
     )
+  } else if(urlProperty.startsWith("/api/continent") && requestMethod === "GET") {
+    const selectedContinent = urlProperty.split("/").pop()
+    const filteredContienent = destination.filter(
+      data => data.continent.toLowerCase() === selectedContinent.toLowerCase()
+    )
+
+    response.writeHead(200, responseHeader)
+
+    response.end(JSON.stringify(filteredContienent))
+
   } else {
     response.writeHead(404, responseHeader)
     response.end(JSON.stringify(errorMessage))
