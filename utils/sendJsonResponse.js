@@ -5,6 +5,7 @@ export const sendJsonResponse = (
   payload
 ) => {
   response.writeHead(statusCode, responseHeader);
+  res.setHeader('Access-Control-Allow-Origin', '*')
 
   response.end(payload, "utf8")
 }

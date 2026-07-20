@@ -2,6 +2,7 @@ import http from "node:http"
 import { getDataFromDb } from "./database/db.js"
 import { sendJsonResponse } from "./utils/sendJsonResponse.js"
 import { getFilteredResponse } from "./utils/getFilteredResponse.js"
+import { getQueryParams } from "./utils/getQueryParams.js"
 
 const PORT = 8000
 
@@ -9,6 +10,7 @@ const server = http.createServer(async (request, response) => {
   const urlProperty = request.url
   const requestMethod = request.method
   const responseHeader = {'Content-Type': 'application/json'}
+  const urlObj = new URL(request.url, `http://${request.headers.host}`)
 
   const destination = await getDataFromDb()
   const errorMessage = {
@@ -16,14 +18,17 @@ const server = http.createServer(async (request, response) => {
     message: "The requested route does not exist"
   }
 
-  if (urlProperty === "/api" && requestMethod === "GET") {
+  const queryObj = Object.fromEntries(urlObj.searchParams)
+
+  if (urlObj.pathname === "/api" && requestMethod === "GET") {
     const stringifiedDestination = JSON.stringify(destination)
+    const queryObj = Object.fromEntries(urlObj.searchParams, stringifiedDestination)
 
     sendJsonResponse(
       response,
       200,
       responseHeader,
-      "Hello from the Node Server"
+      queryObj
     )
 
   } else if(urlProperty.startsWith("/api/continent") && requestMethod === "GET") {
